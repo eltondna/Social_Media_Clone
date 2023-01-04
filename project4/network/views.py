@@ -1,14 +1,34 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-
-from .models import User
+import json
+from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
+from .models import User, Post
 
 
 def index(request):
     return render(request, "network/index.html")
+
+
+@csrf_exempt
+def add(request):
+        # Composing a new email must be via POST
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    data = json.loads(request.body)
+    title = data.get("title","")
+    content = data.get("content","")
+    user = request.user
+    creation_date = datetime.now()
+    new_post = Post(user=user,title=title,content=content,creation_date=creation_date,like=0)
+    new_post.save()
+    return JsonResponse({"message": "Post created successfully."}, status=201)
+
+
 
 
 def login_view(request):

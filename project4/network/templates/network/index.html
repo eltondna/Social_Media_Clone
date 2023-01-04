@@ -1,5 +1,29 @@
 {% extends "network/layout.html" %}
-
+{% load static %}
 {% block body %}
-    TODO
+    
+{% if user.is_authenticated %}
+                                    <!--Add Post -->
+    <form class="add_post" >
+        <h3> Post something</h3><hr>
+        {% csrf_token %}
+        <input class="add_title" type="text" placeholder="title"><br>
+        <textarea class="add_content" type="text" placeholder="Share Something"></textarea><br>
+        <input type="submit" value="Add" class="btn btn-primary">
+    </form>
+{% endif %}
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block script %}
+    <script src="{% static 'network/script.js' %}"></script>
 {% endblock %}
