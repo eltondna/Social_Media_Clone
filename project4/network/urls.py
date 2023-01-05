@@ -9,4 +9,5 @@ urlpatterns = [
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
     path("add",views.add,name="add"),
+    path("post/<str:section>",views.post, name="post"),
 ]

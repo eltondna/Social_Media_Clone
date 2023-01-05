@@ -4,19 +4,19 @@
     
 {% if user.is_authenticated %}
                                     <!--Add Post -->
-    <form class="add_post" >
-        <h3> Post something</h3><hr>
+    <br><br><form class="add_post" >
+        <h3>  {{ user.username }} ~ Post something</h3><hr>
         {% csrf_token %}
-        <input class="add_title" type="text" placeholder="title"><br>
-        <textarea class="add_content" type="text" placeholder="Share Something"></textarea><br>
+        <input class="add_title" type="text" placeholder="title"><br><br>
+        <textarea class="add_content" type="text" placeholder="Share Something"></textarea><br><br>
         <input type="submit" value="Add" class="btn btn-primary">
-    </form>
+    </form><br><br>
+
 {% endif %}
-
-
-
-
-
+<div id="post">
+</div>
+<div id="profile">
+</div>
 
 
 

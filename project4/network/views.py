@@ -7,8 +7,11 @@ import json
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Post
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 
+@login_required(login_url='/login')
 def index(request):
     return render(request, "network/index.html")
 
@@ -27,6 +30,22 @@ def add(request):
     new_post = Post(user=user,title=title,content=content,creation_date=creation_date,like=0)
     new_post.save()
     return JsonResponse({"message": "Post created successfully."}, status=201)
+
+
+
+
+def post(request, section):
+    # Main Page 
+    if section == "all":
+        posts = Post.objects.all()
+    
+    # Specific User Profile 
+    else:
+        user = User.objects.get(username=section)
+        posts = Post.objects.filter(user=user.id)
+
+    posts = posts.order_by("creation_date").all()
+    return JsonResponse([post.serialize() for post in posts],safe=False)
 
 
 

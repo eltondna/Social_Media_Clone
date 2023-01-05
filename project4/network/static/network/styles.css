@@ -1,3 +1,38 @@
 body{
     background-color: rgb(242, 217, 242);
+    color: rgb(54, 54, 54);
+}
+
+
+
+.like{
+    border: none;
+    background-color: transparent;
+    color: red;
+
+}
+
+.i_post{
+    border: 1px solid rgb(255, 255, 255);
+    height: 200px;
+    margin-left: 30px;
+    width: 1325px;
+}
+
+
+.add_post{
+    border: 1px solid rgb(255, 255, 255);
+    height: 250px;
+    margin-left: 30px;
+    width: 1325px;
+}
+
+.nav-link_profile{
+    color:black
+
+}
+
+.i_post:hover{
+    cursor: pointer;
+   
 }
