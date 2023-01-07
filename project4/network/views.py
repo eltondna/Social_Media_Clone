@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, Post,Following
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-
+from django.core.paginator import Paginator
 
 @login_required(login_url='/login')
 def index(request):
@@ -40,11 +40,33 @@ def post(request, section):
         posts = Post.objects.all()
     
     # Specific User Profile 
+    elif section == "following":
+        
+        user = User.objects.get(username=request.user)
+        try:
+    # Create a list for the following posts  
+            include = []
+            f_user = Following.objects.get(user=user)
+            following_users = f_user.following_user.all()
+
+    # Add following users posts into the list 
+            for each_user in following_users:
+                include.append(each_user)
+    
+            posts = Post.objects.filter(user__in =include).order_by("-creation_date")
+            
+        except Following.DoesNotExist:
+            f_user = Following(user=user)
+            f_user.save()
+
     else:
         user = User.objects.get(username=section)
         posts = Post.objects.filter(user=user.id)
+    
+    posts = posts.order_by("-creation_date")
 
-    posts = posts.order_by("creation_date").all()
+    # Create Pagination 
+    
     return JsonResponse([post.serialize() for post in posts],safe=False)
 
 
