@@ -12,12 +12,6 @@ body{
 
 }
 
-.i_post{
-    border: 1px solid rgb(255, 255, 255);
-    height: 200px;
-    margin-left: 30px;
-    width: 1325px;
-}
 
 
 .add_post{
@@ -36,3 +30,4 @@ body{
     cursor: pointer;
    
 }
+

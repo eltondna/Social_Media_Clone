@@ -6,14 +6,16 @@ from django.urls import reverse
 import json
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
-from .models import User, Post
+from .models import User, Post,Following
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 
 @login_required(login_url='/login')
 def index(request):
+
     return render(request, "network/index.html")
+
 
 
 @csrf_exempt
@@ -32,8 +34,6 @@ def add(request):
     return JsonResponse({"message": "Post created successfully."}, status=201)
 
 
-
-
 def post(request, section):
     # Main Page 
     if section == "all":
@@ -49,6 +49,56 @@ def post(request, section):
 
 
 
+@csrf_exempt
+def follow(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    # Get the body data from the fetch data 
+    data = json.loads(request.body)
+    body_user = data.get("user")
+    body_follow_target = data.get("follow_target")
+    user = User.objects.get(username=body_user)
+    f_user = User.objects.get(username =body_follow_target)    
+    
+    # Get the User Object in the Following class 
+           
+    f_object = Following.objects.get(user=user)
+    f_object.save() 
+
+    # 1. Request User follow the user 
+    f_object.following_user.add(f_user)
+
+    # 2. The user is followed by requested user
+
+
+    return JsonResponse(f"Follow {f_user.username} successfully!",safe=False)
+
+
+
+# Get the number of user "following" 
+@csrf_exempt
+def following(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+    data = json.loads(request.body)
+    body_user = data.get("user")
+    user = User.objects.get(username=body_user)
+    
+    # Get User Object in the Following classtry:
+    try:
+        f_user = Following.objects.get(user=user)
+    except Following.DoesNotExist:
+        f_user = Following(user=user)
+        f_user.save()
+    # Get the following list of the user 
+    following_list = f_user.following_user.all()
+
+    return JsonResponse(len(following_list),safe=False)
+
+
+
+
 
 def login_view(request):
     if request.method == "POST":
@@ -61,6 +111,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
+
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "network/login.html", {
