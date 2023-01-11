@@ -9,7 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import User, Post,Following
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+
 
 @login_required(login_url='/login')
 def index(request):
@@ -33,7 +34,7 @@ def add(request):
     new_post.save()
     return JsonResponse({"message": "Post created successfully."}, status=201)
 
-
+@csrf_exempt
 def post(request, section):
     # Main Page 
     if section == "all":
@@ -53,8 +54,7 @@ def post(request, section):
             for each_user in following_users:
                 include.append(each_user)
     
-            posts = Post.objects.filter(user__in =include).order_by("-creation_date")
-            
+            posts = Post.objects.filter(user__in =include).order_by("-creation_date")        
         except Following.DoesNotExist:
             f_user = Following(user=user)
             f_user.save()
@@ -66,8 +66,17 @@ def post(request, section):
     posts = posts.order_by("-creation_date")
 
     # Create Pagination 
-    
-    return JsonResponse([post.serialize() for post in posts],safe=False)
+
+    post_per_page = 2
+    p = Paginator(posts,post_per_page)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number) 
+    except PageNotAnInteger:
+        page_obj = p.page(1)
+    except EmptyPage:
+        page_obj = p.page(p.num_pages)
+    return JsonResponse([post.serialize() for post in page_obj.object_list],safe=False)
 
 
 
