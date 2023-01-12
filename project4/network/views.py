@@ -8,13 +8,12 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Post,Following
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
-
+from django.middleware.csrf import get_token 
 
 @login_required(login_url='/login')
 def index(request):
-
     return render(request, "network/index.html")
 
 
@@ -33,6 +32,7 @@ def add(request):
     new_post = Post(user=user,title=title,content=content,creation_date=creation_date,like=0)
     new_post.save()
     return JsonResponse({"message": "Post created successfully."}, status=201)
+
 
 @csrf_exempt
 def post(request, section):
@@ -80,6 +80,12 @@ def post(request, section):
 
 
 
+
+
+
+
+
+
 @csrf_exempt
 def follow(request):
     if request.method != "POST":
@@ -97,11 +103,8 @@ def follow(request):
     f_object = Following.objects.get(user=user)
     f_object.save() 
 
-    # 1. Request User follow the user 
+    # Request User follow the user 
     f_object.following_user.add(f_user)
-
-    # 2. The user is followed by requested user
-
 
     return JsonResponse(f"Follow {f_user.username} successfully!",safe=False)
 
@@ -127,6 +130,27 @@ def following(request):
 
     return JsonResponse(len(following_list),safe=False)
 
+
+
+#Edit posts
+@login_required(login_url='/login')
+@csrf_protect
+def edit(request,post_id):
+    post = Post.objects.get(id=post_id)
+    if request.method =="PUT":
+        data = json.loads(request.body)
+#1. Check validity of the Update
+        if request.user != post.user:
+            return JsonResponse({"error": "Action Prohibited"},status=400)
+#2. Check existence of body content
+        if data.get('content') is not None:
+            post.content = data["content"]
+        post.save()
+        return JsonResponse(f"Edit post successfully",safe=False)
+    else:
+        return JsonResponse({
+            "error": "PUT request required."
+        },status=400)
 
 
 

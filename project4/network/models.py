@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from django.core import serializers
 
 class User(AbstractUser):
     pass
@@ -14,6 +14,8 @@ class Post(models.Model):
     content = models.CharField(max_length=200)
     creation_date = models.DateTimeField()
     like = models.IntegerField()
+    like_user = models.ManyToManyField(User,related_name="user_like")
+    
 
     def __str__(self):
         return f"Post {self.id}: User: {self.user} Like: {self.like} creation_date: {self.creation_date}"
@@ -25,15 +27,15 @@ class Post(models.Model):
             "title": self.title,
             "content": self.content,
             "date": self.creation_date.strftime("%b %d %Y, %I:%M %p"),
-            "like": self.like
+            "like": self.like,
+            "liked_user": serializers.serialize("json",self.like_user.all()),
         }
-
 
 
 #The users that one user follows
 class Following(models.Model):
     user = models.ForeignKey(User,models.CASCADE,related_name="user_following")
-    following_user = models.ManyToManyField(User,related_name="followed_user")
+    following_user = models.ManyToManyField(User,related_name="followed_by_user")
 
 
     

@@ -21,13 +21,15 @@ body{
     width: 1325px;
 }
 
+
+
+
 .nav-link_profile{
     color:black
 
 }
 
-.i_post:hover{
+.post_title:hover{
     cursor: pointer;
-   
 }
 
