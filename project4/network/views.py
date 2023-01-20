@@ -79,6 +79,30 @@ def post(request, section):
     return JsonResponse([post.serialize() for post in page_obj.object_list],safe=False)
 
 
+# Get specific post 
+@csrf_exempt
+@login_required(login_url='login')
+def get_post(request, post_id):
+    post = Post.objects.get(id=post_id)
+    user = request.user
+    if request.method == "GET":
+        return JsonResponse(post.serialize())
+
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("like") is not None:
+            post.like = data["like"]
+            if data.get("message") == "add":
+                post.like_user.add(user)
+            else:
+                post.like_user.remove(user)
+        post.save()
+        return JsonResponse(post.serialize(),status=204)
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
+
 
 
 

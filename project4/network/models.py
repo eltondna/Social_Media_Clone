@@ -28,7 +28,7 @@ class Post(models.Model):
             "content": self.content,
             "date": self.creation_date.strftime("%b %d %Y, %I:%M %p"),
             "like": self.like,
-            "liked_user": serializers.serialize("json",self.like_user.all()),
+            "like_user": serializers.serialize("json",self.like_user.all()),
         }
 
 
