@@ -36,9 +36,6 @@ class Post(models.Model):
 class Following(models.Model):
     user = models.ForeignKey(User,models.CASCADE,related_name="user_following")
     following_user = models.ManyToManyField(User,related_name="followed_by_user")
-
-
-    
     
 
 
